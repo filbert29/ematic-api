@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Mailchimp API Demo</title>
+</head>
+
+<body>
+  <h1>Mailchimp API Demo</h1>
+  <button id="createListBtn">Create List</button>
+
+  <script>
+    const createListBtn = document.getElementById('createListBtn');
+
+    createListBtn.addEventListener('click', () => {
+      fetch('/').then((response) => {
+        if (response.ok) {
+          alert('New list created successfully!');
+        } else {
+          alert('An error occurred while creating the list.');
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
