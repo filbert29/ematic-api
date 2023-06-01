@@ -14,12 +14,111 @@
 </head>
 
 <body>
+    <style>
+        #data-table {
+            width: 90%;
+            margin: 0px auto;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+        }
+
+        .data-members {
+            display: flex;
+            width: 100vw;
+            text-align: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+
+    <div id="myModal2" class="modal">
+        <div class="modal-content">
+            <button onclick="closeModal()"><span class="close">&times;</span></button>
+            <h2>Unsubscribe</h2>
+            <p>DONT CHANGE EMAIL!!</p>
+            <form action="/unSubscribe" method="POST">
+                <div class="form-group mb-3">
+                    <input type="email" name="email" id="emailSubscribe" class="form-control" placeholder="Email" />
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    Unsubscribe
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <button onclick="closeModal()"><span class="close">&times;</span></button>
+            <h2>Change Data Member</h2>
+            <p>DONT CHANGE ID AND EMAIL!!</p>
+            <form action="/changeDataMember" method="POST">
+                <div class="form-group mb-3">
+                    <input type="email" name="email" id="emailChange" class="form-control" placeholder="Email" />
+                </div>
+                <div class="form-group mb-3">
+                    <input type="text" name="idMember" id="idMember" class="form-control" />
+                </div>
+                <div class="form-group mb-3">
+                    <input type="text" name="firstName" id="firstInput" class="form-control"
+                        placeholder="First Name" required />
+                </div>
+                <div class="form-group mb-3">
+                    <input type="text" name="lastName" id="lastInput" class="form-control" placeholder="Last Name"
+                        required />
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    Add Contact
+                </button>
+            </form>
+        </div>
+    </div>
+
     <div class="container">
         <section class="row mt-5 text-center">
             <div class="col-md-6 m-auto">
                 <h1 class="display-4 mb-4">Ematic API MAILCHIMP</h1>
-                <form action="/test" method="POST">
-                    <!-- <div class="form-group mb-3">
+                <form action="/addContact" method="POST">
+                    <div class="form-group mb-3">
                         <input type="text" name="firstName" id="first-name" class="form-control"
                             placeholder="First Name" required />
                     </div>
@@ -29,14 +128,114 @@
                     </div>
                     <div class="form-group mb-3">
                         <input type="email" name="email" id="email" class="form-control" placeholder="Email" required />
-                    </div> -->
+                    </div>
                     <button type="submit" class="btn btn-primary btn-block">
-                        Sign Up
+                        Add Contact
                     </button>
                 </form>
+                <button class="btn btn-primary btn-block mt-3 mb-3" onclick="createList()">Create List</button> </br>
+                <button class="btn btn-primary btn-block" onclick="getAllMembers()">Get All Members</button>
             </div>
         </section>
     </div>
+    <div class="data-members">
+        <table id="data-table">
+            <h1>All Members</h1>
+            <tr>
+                <th>Email</th>
+                <th>Full Name</th>
+                <th>Status</th>
+                <th>Unsubscribe</th>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        // Get the modal element
+        const modal = document.getElementById('myModal');
+        const modal2 = document.getElementById('myModal2');
+
+        // Get the button that opens the modal
+        const button = document.getElementById('openModalButton');
+
+        // Get the <span> element that closes the modal
+        const closeSpan = document.getElementsByClassName('close')[0];
+
+        // Get the form element
+        const form = document.getElementById('myFormChange');
+
+        // Function to open the modal
+        function openModal(f, l, i, e) {
+            document.getElementById("firstInput").value = f;
+            document.getElementById("lastInput").value = l;
+            document.getElementById("idMember").value = i;
+            document.getElementById("emailChange").value = e;
+            modal.style.display = 'block';
+        }
+
+        function openModal2(i) {
+            document.getElementById("emailSubscribe").value = i;
+            modal2.style.display = 'block';
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            modal.style.display = 'none';
+            modal2.style.display = 'none';
+        }
+
+        const alertForm = async (e, f, l) => {
+            let text;
+            let firstName = prompt("First Name:", f);
+            let lastName = prompt("Last Name:", l);
+            if (person == null || person == "") {
+                text = "User cancelled the prompt.";
+            } else {
+                text = "Hello " + person + "! How are you today?";
+            }
+        }
+
+        const createList = async () => {
+            const response = await fetch('/createList')
+            console.log(response.json())
+        }
+
+        const getAllMembers = async () => {
+            const response = await fetch('/getMembers')
+                .then(response => response.json())
+                .then(data => {
+                    const table = document.getElementById('data-table');
+                    data.forEach(obj => {
+                        const row = table.insertRow();
+                        row.insertCell().textContent = obj.email_address;
+                        row.insertCell().textContent = obj.full_name;
+                        row.insertCell().textContent = obj.status;
+
+                        const buttonCell = row.insertCell();
+
+                        const button1 = document.createElement('button');
+                        button1.textContent = 'Edit';
+                        // Add event listener to button1
+                        button1.addEventListener('click', () => {
+                            // Handle button1 click event here
+                            openModal(obj.merge_fields.FNAME, obj.merge_fields.LNAME, obj.contact_id, obj.email_address)
+                        });
+                        buttonCell.appendChild(button1);
+
+                        const button2 = document.createElement('button');
+                        button2.textContent = 'Unsubscribe';
+                        // Add event listener to button2
+                        button2.addEventListener('click', () => {
+                            openModal2(obj.email_address)
+                        });
+                        buttonCell.appendChild(button2);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
         integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
