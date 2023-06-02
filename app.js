@@ -16,37 +16,15 @@ mailchimp.setConfig({
     server: "us12",
 });
 
-const createList = async () => {
+app.get('/deleteList', async (req, res) => {
+    const IdList = await client.lists.getAllLists();
+
     try {
-        const response = await client.lists.createList({
-            name: "name",
-            permission_reminder: "permission_reminder",
-            email_type_option: true,
-            contact: {
-                company: "company",
-                address1: "address1",
-                city: "city",
-                country: "country",
-                state: "state",
-                zip: "12332"
-            },
-            campaign_defaults: {
-                from_name: "from_name",
-                from_email: "Beulah_Ryan@hotmail.com",
-                subject: "subject",
-                language: "language",
-            },
-        });
-        console.log(response);
-        res.redirect('/success.html')
-    } catch (err) {
-        console.log(err.response.body)
+        const response = await mailchimp.lists.deleteList(IdList.lists[0].id);
+        console.log('List deleted successfully:', response);
+    } catch (error) {
+        console.error('Error deleting list:', error);
     }
-}
-
-
-app.post('/createList', async (req, res) => {
-    createList();
 })
 
 app.get('/getMembers', async (req, res) => {
@@ -80,14 +58,43 @@ app.post('/addContact', async (req, res) => {
         ]
     };
 
-    console.log(data)
+    try {
+        const response = await client.lists.batchListMembers(IdList.lists[0].id, data);
+        console.log(response);
+    } catch (err) {
+        console.log(err.response.body)
+    }
+})
 
-    // try {
-    //     const response = await client.lists.batchListMembers(IdList.lists[0].id, data);
-    //     console.log(response);
-    // } catch (err) {
-    //     console.log(err.response.body)
-    // }
+app.post('/createList', async (req, res) => {
+    const IdList = await client.lists.getAllLists();
+
+    const { name } = req.body;
+
+    try {
+        const response = await client.lists.createList({
+            name: name,
+            permission_reminder: "permission_reminder",
+            email_type_option: true,
+            contact: {
+                company: "company",
+                address1: "address1",
+                city: "city",
+                country: "country",
+                state: "state",
+                zip: "12332"
+            },
+            campaign_defaults: {
+                from_name: "from_name",
+                from_email: "Ematic@hotmail.com",
+                subject: "subject",
+                language: "language",
+            },
+        });
+        console.log(response);
+    } catch (err) {
+        console.log(err.response.body)
+    }
 })
 
 app.post('/changeDataMember', async (req, res) => {

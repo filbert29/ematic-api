@@ -32,6 +32,7 @@
             text-align: center;
             justify-content: center;
             flex-direction: column;
+            margin-bottom: 200px;
         }
 
         .modal {
@@ -68,6 +69,13 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+        #formAddContact,
+        #formCreateList {
+            border: 1px solid black;
+            padding: 50px;
+            margin-bottom: 30px;
+        }
     </style>
 
     <div id="myModal2" class="modal">
@@ -99,8 +107,8 @@
                     <input type="text" name="idMember" id="idMember" class="form-control" />
                 </div>
                 <div class="form-group mb-3">
-                    <input type="text" name="firstName" id="firstInput" class="form-control"
-                        placeholder="First Name" required />
+                    <input type="text" name="firstName" id="firstInput" class="form-control" placeholder="First Name"
+                        required />
                 </div>
                 <div class="form-group mb-3">
                     <input type="text" name="lastName" id="lastInput" class="form-control" placeholder="Last Name"
@@ -117,24 +125,43 @@
         <section class="row mt-5 text-center">
             <div class="col-md-6 m-auto">
                 <h1 class="display-4 mb-4">Ematic API MAILCHIMP</h1>
-                <form action="/addContact" method="POST">
-                    <div class="form-group mb-3">
-                        <input type="text" name="firstName" id="first-name" class="form-control"
-                            placeholder="First Name" required />
-                    </div>
-                    <div class="form-group mb-3">
-                        <input type="text" name="lastName" id="last-name" class="form-control" placeholder="Last Name"
-                            required />
-                    </div>
-                    <div class="form-group mb-3">
-                        <input type="email" name="email" id="email" class="form-control" placeholder="Email" required />
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-block">
-                        Add Contact
-                    </button>
-                </form>
-                <button class="btn btn-primary btn-block mt-3 mb-3" onclick="createList()">Create List</button> </br>
-                <button class="btn btn-primary btn-block" onclick="getAllMembers()">Get All Members</button>
+                <div id="formCreateList">
+                    <h2>Create and Delete List</h2>
+                    <p>note: An account can only have 1 list, so it can only add once. If you want to try creating a list, delete it first.</p>
+                    <form action="/createList" method="POST">
+                        <div class="form-group mb-3">
+                            <input type="text" name="name" id="list-name" class="form-control" placeholder="List Name"
+                                required />
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            Create List
+                        </button>
+                    </form>
+                    <button class="btn btn-primary btn-block mt-3" onclick="deleteList()">Delete List</button> </br>
+                </div>
+                <div id="formAddContact">
+                    <h2>Create New Member</h2>
+                    <p>note: </p>
+                    <form  action="/addContact" method="POST">
+                        <div class="form-group mb-3">
+                            <input type="text" name="firstName" id="first-name" class="form-control"
+                                placeholder="First Name" required />
+                        </div>
+                        <div class="form-group mb-3">
+                            <input type="text" name="lastName" id="last-name" class="form-control"
+                                placeholder="Last Name" required />
+                        </div>
+                        <div class="form-group mb-3">
+                            <input type="email" name="email" id="email" class="form-control" placeholder="Email"
+                                required />
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            Add Contact
+                        </button>
+                    </form>
+                </div>
+                
+                <button class="btn btn-primary btn-block mt-5" onclick="getAllMembers()">Get All Members</button>
             </div>
         </section>
     </div>
@@ -151,25 +178,26 @@
     </div>
 
     <script>
-        // Get the modal element
         const modal = document.getElementById('myModal');
         const modal2 = document.getElementById('myModal2');
 
-        // Get the button that opens the modal
         const button = document.getElementById('openModalButton');
 
-        // Get the <span> element that closes the modal
         const closeSpan = document.getElementsByClassName('close')[0];
 
-        // Get the form element
         const form = document.getElementById('myFormChange');
 
-        // Function to open the modal
-        function openModal(f, l, i, e) {
-            document.getElementById("firstInput").value = f;
-            document.getElementById("lastInput").value = l;
-            document.getElementById("idMember").value = i;
-            document.getElementById("emailChange").value = e;
+        // element.addEventListener("submit", handleSubmit)
+
+        // const handleSubmit = () => {
+        //     event.preventDefault
+        // }
+
+        function openModal(firstName, lastName, idMember, email) {
+            document.getElementById("firstInput").value = firstName;
+            document.getElementById("lastInput").value = lastName;
+            document.getElementById("idMember").value = idMember;
+            document.getElementById("emailChange").value = email;
             modal.style.display = 'block';
         }
 
@@ -195,8 +223,8 @@
             }
         }
 
-        const createList = async () => {
-            const response = await fetch('/createList')
+        const deleteList = async () => {
+            const response = await fetch('/deleteList')
             console.log(response.json())
         }
 
@@ -215,16 +243,13 @@
 
                         const button1 = document.createElement('button');
                         button1.textContent = 'Edit';
-                        // Add event listener to button1
                         button1.addEventListener('click', () => {
-                            // Handle button1 click event here
                             openModal(obj.merge_fields.FNAME, obj.merge_fields.LNAME, obj.contact_id, obj.email_address)
                         });
                         buttonCell.appendChild(button1);
 
                         const button2 = document.createElement('button');
                         button2.textContent = 'Unsubscribe';
-                        // Add event listener to button2
                         button2.addEventListener('click', () => {
                             openModal2(obj.email_address)
                         });
