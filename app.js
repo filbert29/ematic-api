@@ -4,6 +4,7 @@ const path = require('path');
 const mailchimp = require("@mailchimp/mailchimp_marketing");
 const client = require("@mailchimp/mailchimp_marketing");
 const debug = require('debug')('myapp');
+require('dotenv').config();
 
 const app = express();
 
@@ -12,7 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 mailchimp.setConfig({
-    apiKey: "2da7ddd71707dfc2c6fbdc0b767684d8-us12",
+    apiKey: process.env.MAILCHIMP_API_KEY,
     server: "us12",
 });
 
